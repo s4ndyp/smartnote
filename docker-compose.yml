@@ -1,0 +1,18 @@
+services:
+  pocketbase:
+    build: .
+    container_name: smartnote
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - smartnote_data:/pb/pb_data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  smartnote_data:
