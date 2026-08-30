@@ -313,6 +313,9 @@
       font-weight: 600;
       cursor: pointer;
       padding: 0.4rem;
+      border: 1px solid var(--line);
+      color: rgba(240, 230, 212, 0.52);
+      transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
     }
 
     .period input {
@@ -321,9 +324,19 @@
       pointer-events: none;
     }
 
+    .period label:has(input:not(:checked)) {
+      opacity: 0.68;
+    }
+
     .period label:has(input:checked) {
-      background: linear-gradient(180deg, rgba(143, 168, 148, 0.28), rgba(143, 168, 148, 0.08));
-      border-color: rgba(143, 168, 148, 0.5);
+      opacity: 1;
+      color: var(--paper);
+      font-weight: 700;
+      background: linear-gradient(180deg, rgba(201, 163, 106, 0.42), rgba(201, 163, 106, 0.16));
+      border: 2px solid var(--brass);
+      box-shadow:
+        0 0 0 1px rgba(201, 163, 106, 0.28),
+        0 10px 24px rgba(201, 163, 106, 0.22);
     }
 
     .save {
