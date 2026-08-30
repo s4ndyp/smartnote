@@ -313,6 +313,9 @@
       font-weight: 600;
       cursor: pointer;
       padding: 0.4rem;
+      border: 1px solid var(--line);
+      color: rgba(240, 230, 212, 0.52);
+      transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
     }
 
     .period input {
@@ -321,9 +324,19 @@
       pointer-events: none;
     }
 
+    .period label:has(input:not(:checked)) {
+      opacity: 0.68;
+    }
+
     .period label:has(input:checked) {
-      background: linear-gradient(180deg, rgba(143, 168, 148, 0.28), rgba(143, 168, 148, 0.08));
-      border-color: rgba(143, 168, 148, 0.5);
+      opacity: 1;
+      color: var(--paper);
+      font-weight: 700;
+      background: linear-gradient(180deg, rgba(201, 163, 106, 0.42), rgba(201, 163, 106, 0.16));
+      border: 2px solid var(--brass);
+      box-shadow:
+        0 0 0 1px rgba(201, 163, 106, 0.28),
+        0 10px 24px rgba(201, 163, 106, 0.22);
     }
 
     .save {
@@ -350,6 +363,42 @@
       gap: 0;
     }
 
+    .list-toolbar {
+      margin-bottom: 0.85rem;
+    }
+
+    .filter-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(240, 230, 212, 0.55);
+    }
+
+    .filter-select {
+      width: 100%;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--paper);
+      background-color: rgba(255, 244, 224, 0.08);
+      border: 1px solid var(--line);
+      border-radius: 0.85rem;
+      padding: 0.75rem 2.4rem 0.75rem 0.95rem;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23f0e6d4' fill-opacity='.55' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.95rem center;
+      outline: none;
+    }
+
+    .filter-select:focus {
+      border-color: rgba(201, 163, 106, 0.7);
+    }
+
     .empty {
       color: rgba(240, 230, 212, 0.5);
       padding: 2.2rem 0.2rem;
@@ -363,6 +412,59 @@
       border-bottom: 1px solid rgba(240, 230, 212, 0.1);
       text-align: left;
       width: 100%;
+    }
+
+    .note-row {
+      grid-template-columns: 2.4rem 1fr;
+      align-items: start;
+      column-gap: 0.7rem;
+    }
+
+    .note-row.is-pinned,
+    .todo-row.is-pinned {
+      background: linear-gradient(90deg, rgba(201, 163, 106, 0.1), transparent 55%);
+    }
+
+    .note-main,
+    .todo-main {
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      padding: 0;
+      cursor: pointer;
+      min-width: 0;
+    }
+
+    .pin {
+      width: 2.2rem;
+      height: 2.2rem;
+      margin-top: 0.05rem;
+      border-radius: 0.55rem;
+      border: 1px solid var(--line);
+      background: rgba(255, 244, 224, 0.05);
+      display: grid;
+      place-items: center;
+      transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+    }
+
+    .pin:active { transform: scale(0.94); }
+
+    .pin-icon {
+      width: 1rem;
+      height: 1rem;
+      fill: rgba(240, 230, 212, 0.38);
+      transition: fill 0.16s ease;
+    }
+
+    .pin.is-on {
+      background: linear-gradient(180deg, rgba(201, 163, 106, 0.34), rgba(201, 163, 106, 0.12));
+      border-color: rgba(201, 163, 106, 0.65);
+    }
+
+    .pin.is-on .pin-icon {
+      fill: var(--brass);
     }
 
     .note-row:active, .todo-row:active { opacity: 0.7; }
@@ -391,7 +493,7 @@
     }
 
     .todo-row {
-      grid-template-columns: 2.4rem 1fr;
+      grid-template-columns: 2.4rem 1fr 2.2rem auto;
       align-items: start;
       column-gap: 0.7rem;
     }
@@ -428,7 +530,21 @@
       color: rgba(240, 230, 212, 0.42);
     }
 
-    .todo-main { text-align: left; }
+    .todo-main { min-width: 0; }
+
+    .row-age {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: rgba(240, 230, 212, 0.42);
+      white-space: nowrap;
+      padding-top: 0.2rem;
+      text-align: right;
+      letter-spacing: -0.01em;
+    }
+
+    .todo-row.is-done .row-age {
+      opacity: 0.55;
+    }
 
     #toast {
       position: fixed;
@@ -562,6 +678,11 @@
         <button class="glass back" type="button" data-go="home" aria-label="Home">‹</button>
         <h2>Notities</h2>
       </header>
+      <div id="notes-toolbar" class="list-toolbar hidden">
+        <label class="filter-field" for="notes-filter">Filter op kenmerk
+          <select id="notes-filter" class="glass filter-select"></select>
+        </label>
+      </div>
       <div id="notes-list" class="list"></div>
     </section>
 
@@ -570,6 +691,11 @@
         <button class="glass back" type="button" data-go="home" aria-label="Home">‹</button>
         <h2>To-do’s</h2>
       </header>
+      <div id="todos-toolbar" class="list-toolbar hidden">
+        <label class="filter-field" for="todos-filter">Filter op kenmerk
+          <select id="todos-filter" class="glass filter-select"></select>
+        </label>
+      </div>
       <div id="todos-list" class="list"></div>
     </section>
 
@@ -589,6 +715,12 @@
     let noteId = "";
     let todoId = "";
     let deleteArmed = "";
+    let ageTimer = null;
+    let notesItems = [];
+    let todosItems = [];
+    let notesKenmerkFilter = "";
+    let todosKenmerkFilter = "";
+    const NO_KENMERK = "__none__";
 
     function go(route) {
       location.hash = route.startsWith("#") ? route : "#" + route;
@@ -614,12 +746,191 @@
       }[ch]));
     }
 
-    function fmtDate(value) {
-      if (!value) return "";
+    function parsePbDate(value) {
+      if (!value) return null;
       const iso = value.includes("T") ? value : value.replace(" ", "T");
       const d = new Date(iso);
-      if (Number.isNaN(d.getTime())) return "";
-      return d.toLocaleDateString("nl-NL", { day: "numeric", month: "short" });
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    function fmtDate(value) {
+      const d = parsePbDate(value);
+      if (!d) return "";
+      return d.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+    }
+
+    function fmtElapsed(value) {
+      const d = parsePbDate(value);
+      if (!d) return "";
+      const sec = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000));
+      if (sec < 60) return "nu";
+      const min = Math.floor(sec / 60);
+      if (min < 60) return min === 1 ? "1 min" : min + " min";
+      const hr = Math.floor(min / 60);
+      if (hr < 24) return hr === 1 ? "1 uur" : hr + " uur";
+      const day = Math.floor(hr / 24);
+      if (day < 30) return day === 1 ? "1 dag" : day + " dagen";
+      const month = Math.floor(day / 30);
+      if (month < 12) return month === 1 ? "1 maand" : month + " maanden";
+      const year = Math.floor(day / 365);
+      return year === 1 ? "1 jaar" : year + " jaren";
+    }
+
+    function refreshTodoAges() {
+      $$("[data-created]").forEach((el) => {
+        el.textContent = fmtElapsed(el.dataset.created);
+      });
+    }
+
+    function startAgeTimer() {
+      clearInterval(ageTimer);
+      refreshTodoAges();
+      ageTimer = setInterval(refreshTodoAges, 30000);
+    }
+
+    function stopAgeTimer() {
+      clearInterval(ageTimer);
+      ageTimer = null;
+    }
+
+    function kenmerkKey(item) {
+      const value = (item.kenmerk || "").trim();
+      return value || NO_KENMERK;
+    }
+
+    function kenmerkLabel(key) {
+      return key === NO_KENMERK ? "Zonder kenmerk" : key;
+    }
+
+    function uniqueKenmerken(items) {
+      const seen = new Map();
+      items.forEach((item) => {
+        const key = kenmerkKey(item);
+        if (!seen.has(key)) seen.set(key, kenmerkLabel(key));
+      });
+      return [...seen.entries()].sort((a, b) => {
+        if (a[0] === NO_KENMERK) return 1;
+        if (b[0] === NO_KENMERK) return -1;
+        return a[1].localeCompare(b[1], "nl");
+      });
+    }
+
+    function fillKenmerkFilter(select, items, current) {
+      const options = uniqueKenmerken(items);
+      select.innerHTML = '<option value="">Alle kenmerken</option>' + options.map(([key, label]) =>
+        `<option value="${esc(key)}">${esc(label)}</option>`
+      ).join("");
+      const valid = !current || options.some(([key]) => key === current);
+      select.value = valid ? current : "";
+      if (!valid) {
+        if (select.id === "notes-filter") notesKenmerkFilter = "";
+        if (select.id === "todos-filter") todosKenmerkFilter = "";
+      }
+    }
+
+    function filterByKenmerk(items, filter) {
+      if (!filter) return items;
+      return items.filter((item) => kenmerkKey(item) === filter);
+    }
+
+    function sortNotes(items) {
+      return [...items].sort((a, b) => {
+        const pinDiff = Number(!!b.pinned) - Number(!!a.pinned);
+        if (pinDiff) return pinDiff;
+        return parsePbDate(b.created) - parsePbDate(a.created);
+      });
+    }
+
+    function sortTodos(items) {
+      return [...items].sort((a, b) => {
+        const pinDiff = Number(!!b.pinned) - Number(!!a.pinned);
+        if (pinDiff) return pinDiff;
+        const doneDiff = Number(!!a.done) - Number(!!b.done);
+        if (doneDiff) return doneDiff;
+        return parsePbDate(b.created) - parsePbDate(a.created);
+      });
+    }
+
+    function pinButton(kind, item) {
+      const pinned = !!item.pinned;
+      const attr = kind === "note" ? "data-note-pin" : "data-todo-pin";
+      const label = pinned ? "Losmaken" : "Vastpinnen";
+      return `
+        <button class="pin${pinned ? " is-on" : ""}" type="button" ${attr}="${esc(item.id)}" data-pinned="${pinned ? "1" : "0"}" aria-label="${label}">
+          <svg class="pin-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3v3l4 4v2h-5v8l-1 1-1-1v-8H8v-2l4-4V3h4z"/></svg>
+        </button>
+      `;
+    }
+
+    async function togglePin(kind, id, pinned) {
+      const collection = kind === "note" ? "notes" : "todos";
+      const items = kind === "note" ? notesItems : todosItems;
+      const next = !pinned;
+      await api("/collections/" + collection + "/records/" + encodeURIComponent(id), {
+        method: "PATCH",
+        body: { pinned: next }
+      });
+      const item = items.find((entry) => entry.id === id);
+      if (item) item.pinned = next;
+      if (kind === "note") renderNotesList();
+      else renderTodosList();
+      toast(next ? "Vastgepind" : "Losgemaakt");
+    }
+
+    function renderNotesList() {
+      const box = $("#notes-list");
+      const toolbar = $("#notes-toolbar");
+      if (!notesItems.length) {
+        toolbar.classList.add("hidden");
+        box.innerHTML = '<p class="empty">Nog geen notities. Maak er een vanaf het startscherm.</p>';
+        return;
+      }
+      toolbar.classList.remove("hidden");
+      const filtered = sortNotes(filterByKenmerk(notesItems, notesKenmerkFilter));
+      if (!filtered.length) {
+        box.innerHTML = '<p class="empty">Geen notities met dit kenmerk.</p>';
+        return;
+      }
+      box.innerHTML = filtered.map((item) => `
+        <div class="note-row${item.pinned ? " is-pinned" : ""}">
+          ${pinButton("note", item)}
+          <button class="note-main" type="button" data-open-note="${esc(item.id)}">
+            <span class="row-title">${esc(item.title)}</span>
+            <span class="row-meta">${item.kenmerk ? esc(item.kenmerk) : "zonder kenmerk"} · ${esc(fmtDate(item.created))}</span>
+            <span class="row-body">${esc(item.beschrijving || "")}</span>
+          </button>
+        </div>
+      `).join("");
+    }
+
+    function renderTodosList() {
+      const box = $("#todos-list");
+      const toolbar = $("#todos-toolbar");
+      if (!todosItems.length) {
+        toolbar.classList.add("hidden");
+        stopAgeTimer();
+        box.innerHTML = '<p class="empty">Nog geen to-do’s. Sla er een op vanaf het startscherm.</p>';
+        return;
+      }
+      toolbar.classList.remove("hidden");
+      const filtered = sortTodos(filterByKenmerk(todosItems, todosKenmerkFilter));
+      if (!filtered.length) {
+        stopAgeTimer();
+        box.innerHTML = '<p class="empty">Geen to-do’s met dit kenmerk.</p>';
+        return;
+      }
+      box.innerHTML = filtered.map((item) => `
+        <div class="todo-row${item.done ? " is-done" : ""}${item.pinned ? " is-pinned" : ""}">
+          <button class="check${item.done ? " is-on" : ""}" type="button" data-todo-check="${esc(item.id)}" data-done="${item.done ? "1" : "0"}" aria-label="Afvinken"></button>
+          <button class="todo-main" type="button" data-open-todo="${esc(item.id)}">
+            <span class="row-title">${esc(item.title)}</span>
+            <span class="row-meta">${esc(PERIODS[item.periode] || item.periode)}${item.kenmerk ? " · " + esc(item.kenmerk) : ""}</span>
+          </button>
+          ${pinButton("todo", item)}
+          <span class="row-age" data-created="${esc(item.created)}" aria-label="Aangemaakt ${esc(fmtElapsed(item.created))} geleden">${esc(fmtElapsed(item.created))}</span>
+        </div>
+      `).join("");
+      startAgeTimer();
     }
 
     async function parseErr(res) {
@@ -714,42 +1025,25 @@
       const box = $("#notes-list");
       box.innerHTML = '<p class="empty">Laden…</p>';
       const data = await api("/collections/notes/records?sort=-created&perPage=200");
-      if (!data.items.length) {
-        box.innerHTML = '<p class="empty">Nog geen notities. Maak er een vanaf het startscherm.</p>';
-        return;
-      }
-      box.innerHTML = data.items.map((item) => `
-        <button class="note-row" type="button" data-open-note="${esc(item.id)}">
-          <span class="row-title">${esc(item.title)}</span>
-          <span class="row-meta">${item.kenmerk ? esc(item.kenmerk) : "zonder kenmerk"} · ${esc(fmtDate(item.created))}</span>
-          <span class="row-body">${esc(item.beschrijving || "")}</span>
-        </button>
-      `).join("");
+      notesItems = data.items;
+      fillKenmerkFilter($("#notes-filter"), notesItems, notesKenmerkFilter);
+      renderNotesList();
     }
 
     async function loadTodos() {
       const box = $("#todos-list");
       box.innerHTML = '<p class="empty">Laden…</p>';
       const data = await api("/collections/todos/records?sort=done,-created&perPage=200");
-      if (!data.items.length) {
-        box.innerHTML = '<p class="empty">Nog geen to-do’s. Sla er een op vanaf het startscherm.</p>';
-        return;
-      }
-      box.innerHTML = data.items.map((item) => `
-        <div class="todo-row${item.done ? " is-done" : ""}">
-          <button class="check${item.done ? " is-on" : ""}" type="button" data-todo-check="${esc(item.id)}" data-done="${item.done ? "1" : "0"}" aria-label="Afvinken"></button>
-          <button class="todo-main" type="button" data-open-todo="${esc(item.id)}">
-            <span class="row-title">${esc(item.title)}</span>
-            <span class="row-meta">${esc(PERIODS[item.periode] || item.periode)}${item.kenmerk ? " · " + esc(item.kenmerk) : ""}</span>
-          </button>
-        </div>
-      `).join("");
+      todosItems = data.items;
+      fillKenmerkFilter($("#todos-filter"), todosItems, todosKenmerkFilter);
+      renderTodosList();
     }
 
     async function render() {
       const { name, id } = route();
       const view = ["home", "note", "todo", "notes", "todos"].includes(name) ? name : "home";
       showView(view);
+      if (view !== "todos") stopAgeTimer();
       try {
         if (view === "note") await fillNote(id);
         if (view === "todo") await fillTodo(id);
@@ -794,6 +1088,25 @@
         } catch (err) {
           toast(err.message);
         }
+        return;
+      }
+      const notePin = event.target.closest("[data-note-pin]");
+      if (notePin) {
+        try {
+          await togglePin("note", notePin.dataset.notePin, notePin.dataset.pinned === "1");
+        } catch (err) {
+          toast(err.message);
+        }
+        return;
+      }
+      const todoPin = event.target.closest("[data-todo-pin]");
+      if (todoPin) {
+        try {
+          await togglePin("todo", todoPin.dataset.todoPin, todoPin.dataset.pinned === "1");
+        } catch (err) {
+          toast(err.message);
+        }
+        return;
       }
     });
 
@@ -830,7 +1143,7 @@
         if (todoId) {
           await api("/collections/todos/records/" + encodeURIComponent(todoId), { method: "PATCH", body });
         } else {
-          await api("/collections/todos/records", { method: "POST", body: { ...body, done: false } });
+          await api("/collections/todos/records", { method: "POST", body: { ...body, done: false, pinned: false } });
         }
         toast("To-do opgeslagen");
         go("todos");
@@ -863,6 +1176,16 @@
 
     $("#note-delete").addEventListener("click", () => confirmDelete("note", $("#note-delete")));
     $("#todo-delete").addEventListener("click", () => confirmDelete("todo", $("#todo-delete")));
+
+    $("#notes-filter").addEventListener("change", (event) => {
+      notesKenmerkFilter = event.target.value;
+      renderNotesList();
+    });
+
+    $("#todos-filter").addEventListener("change", (event) => {
+      todosKenmerkFilter = event.target.value;
+      renderTodosList();
+    });
 
     window.addEventListener("hashchange", render);
     render();
