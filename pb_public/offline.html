@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#100e0c">
+  <title>Smartnote — offline</title>
+  <style>
+    :root {
+      --ink: #100e0c;
+      --paper: #f0e6d4;
+      --brass: #c9a36a;
+      --font-brand: "Fraunces", "Iowan Old Style", Georgia, serif;
+      --font-ui: "Sora", "Avenir Next", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 2rem 1.25rem;
+      font-family: var(--font-ui);
+      color: var(--paper);
+      background:
+        radial-gradient(120% 70% at 12% -10%, rgba(201, 163, 106, 0.22), transparent 52%),
+        linear-gradient(180deg, #1c1814 0%, var(--ink) 50%, #0b0a09 100%);
+      text-align: center;
+    }
+    h1 {
+      font-family: var(--font-brand);
+      font-size: 2.4rem;
+      margin-bottom: 0.6rem;
+    }
+    p {
+      color: rgba(240, 230, 212, 0.62);
+      max-width: 20rem;
+      line-height: 1.5;
+      margin: 0 auto 1.4rem;
+    }
+    button {
+      font: inherit;
+      color: var(--paper);
+      background: linear-gradient(180deg, rgba(201, 163, 106, 0.28), rgba(201, 163, 106, 0.1));
+      border: 1px solid rgba(201, 163, 106, 0.45);
+      border-radius: 0.9rem;
+      padding: 0.85rem 1.3rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Smartnote</h1>
+    <p>Je bent offline. Open de app opnieuw zodra je verbinding hebt.</p>
+    <button type="button" onclick="location.href='/'">Opnieuw proberen</button>
+  </main>
+</body>
+</html>
