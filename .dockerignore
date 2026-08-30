@@ -1,0 +1,7 @@
+.git
+.github
+pb_data
+README.md
+.gitignore
+.dockerignore
+*.md

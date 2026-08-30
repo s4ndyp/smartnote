@@ -1,6 +1,5 @@
 FROM alpine:latest
 
-# PocketBase >= 0.23 is required for bijlage+/file append modifiers used by the UI.
 ARG PB_VERSION=0.40.1
 
 RUN apk add --no-cache \
@@ -15,8 +14,8 @@ RUN unzip /tmp/pb.zip -d /pb/ \
     && chmod +x /pb/pocketbase
 
 COPY ./pb_public /pb/pb_public
+COPY ./pb_migrations /pb/pb_migrations
 
-# Persist database + uploaded files outside the container layer.
 WORKDIR /pb
 VOLUME ["/pb/pb_data"]
 

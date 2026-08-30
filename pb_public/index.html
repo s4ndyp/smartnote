@@ -1,1 +1,871 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#100e0c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Smartnote">
+  <title>Smartnote</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #100e0c;
+      --ink-2: #1a1714;
+      --paper: #f0e6d4;
+      --brass: #c9a36a;
+      --sage: #8fa894;
+      --mist: rgba(240, 230, 212, 0.1);
+      --line: rgba(240, 230, 212, 0.16);
+      --glass: linear-gradient(180deg, rgba(255, 244, 224, 0.14), rgba(255, 244, 224, 0.05));
+      --dock-h: 4.5rem;
+      --font-ui: "Sora", "Avenir Next", sans-serif;
+      --font-brand: "Fraunces", "Iowan Old Style", serif;
+      --radius: 1.1rem;
+    }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    html { background: var(--ink); color-scheme: dark; }
+
+    body {
+      min-height: 100dvh;
+      font-family: var(--font-ui);
+      color: var(--paper);
+      background:
+        radial-gradient(120% 70% at 12% -10%, rgba(201, 163, 106, 0.22), transparent 52%),
+        radial-gradient(80% 50% at 100% 0%, rgba(143, 168, 148, 0.12), transparent 48%),
+        linear-gradient(180deg, #1c1814 0%, var(--ink) 42%, #0b0a09 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 8;
+      opacity: 0.07;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .app {
+      width: min(100%, 430px);
+      margin: 0 auto;
+      min-height: 100dvh;
+      position: relative;
+    }
+
+    .view {
+      display: none;
+      flex-direction: column;
+      min-height: 100dvh;
+      padding: calc(0.75rem + env(safe-area-inset-top)) 1.25rem calc(var(--dock-h) + env(safe-area-inset-bottom) + 0.75rem);
+    }
+
+    .view.active {
+      display: flex;
+      animation: rise 0.42s ease;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    #view-home {
+      padding-top: env(safe-area-inset-top);
+    }
+
+    .hero-visual {
+      height: 28vh;
+      min-height: 9.5rem;
+      max-height: 14rem;
+      margin: 0 -1.25rem;
+      overflow: hidden;
+    }
+
+    .hero-visual svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      animation: settle 0.9s ease both;
+    }
+
+    @keyframes settle {
+      from { opacity: 0; transform: scale(1.06); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .brand-block {
+      padding: 0.35rem 0 1.1rem;
+    }
+
+    .brand-block h1 {
+      font-family: var(--font-brand);
+      font-size: clamp(2.6rem, 12vw, 3.4rem);
+      font-weight: 700;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      color: var(--paper);
+    }
+
+    .headline {
+      margin-top: 0.7rem;
+      font-size: 1.05rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+
+    .lede {
+      margin-top: 0.3rem;
+      color: rgba(240, 230, 212, 0.62);
+      font-size: 0.92rem;
+      max-width: 22rem;
+    }
+
+    .cta-stack {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .glass {
+      background: var(--glass);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    button, .btn {
+      font-family: inherit;
+      color: inherit;
+      cursor: pointer;
+      appearance: none;
+      border: 0;
+      background: none;
+    }
+
+    .giant {
+      flex: 1;
+      min-height: 5.6rem;
+      border-radius: var(--radius);
+      padding: 1.15rem 1.3rem;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.2rem;
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+
+    .giant strong {
+      font-size: 1.28rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+
+    .giant span {
+      color: rgba(240, 230, 212, 0.62);
+      font-size: 0.88rem;
+    }
+
+    .giant:active { transform: scale(0.975); }
+    .giant.note { border-color: rgba(201, 163, 106, 0.38); }
+    .giant.todo { border-color: rgba(143, 168, 148, 0.38); }
+
+    .dock {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: min(100%, 430px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+      padding: 0.55rem 1.25rem calc(0.55rem + env(safe-area-inset-bottom));
+      background: linear-gradient(180deg, transparent, rgba(16, 14, 12, 0.92) 28%);
+      z-index: 6;
+    }
+
+    .dock button {
+      border-radius: 0.9rem;
+      min-height: 3.15rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+      transition: transform 0.16s ease, background 0.16s ease;
+    }
+
+    .dock button.is-on {
+      background: linear-gradient(180deg, rgba(201, 163, 106, 0.22), rgba(201, 163, 106, 0.08));
+      border-color: rgba(201, 163, 106, 0.4);
+    }
+
+    .dock button:active { transform: scale(0.97); }
+
+    .screen-head {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-bottom: 1.15rem;
+    }
+
+    .back {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.8rem;
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
+    .screen-head h2 {
+      font-family: var(--font-brand);
+      font-size: 1.7rem;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      flex: 1;
+    }
+
+    label.field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(240, 230, 212, 0.55);
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      font-family: inherit;
+      font-size: 16px;
+      color: var(--paper);
+      background: rgba(255, 244, 224, 0.05);
+      border: 1px solid var(--line);
+      border-radius: 0.85rem;
+      padding: 0.85rem 0.95rem;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 38vh;
+      resize: vertical;
+      line-height: 1.55;
+      font-weight: 400;
+    }
+
+    input:focus, textarea:focus {
+      border-color: rgba(201, 163, 106, 0.7);
+    }
+
+    .tools {
+      display: flex;
+      gap: 0.45rem;
+    }
+
+    .tools button {
+      border-radius: 0.7rem;
+      padding: 0.45rem 0.7rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+
+    .tools button:active { transform: scale(0.97); }
+
+    .period {
+      border: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.45rem;
+    }
+
+    .period legend {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(240, 230, 212, 0.55);
+      margin-bottom: 0.4rem;
+      padding: 0;
+    }
+
+    .period label {
+      border-radius: 0.85rem;
+      min-height: 3.2rem;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.4rem;
+    }
+
+    .period input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .period label:has(input:checked) {
+      background: linear-gradient(180deg, rgba(143, 168, 148, 0.28), rgba(143, 168, 148, 0.08));
+      border-color: rgba(143, 168, 148, 0.5);
+    }
+
+    .save {
+      margin-top: auto;
+      min-height: 3.3rem;
+      border-radius: var(--radius);
+      font-size: 1.02rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .save:active { transform: scale(0.98); }
+
+    .danger {
+      min-height: 2.8rem;
+      border-radius: 0.85rem;
+      color: #e0b4aa;
+      font-weight: 500;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .empty {
+      color: rgba(240, 230, 212, 0.5);
+      padding: 2.2rem 0.2rem;
+      line-height: 1.5;
+    }
+
+    .note-row, .todo-row {
+      display: grid;
+      gap: 0.2rem;
+      padding: 0.95rem 0;
+      border-bottom: 1px solid rgba(240, 230, 212, 0.1);
+      text-align: left;
+      width: 100%;
+    }
+
+    .note-row:active, .todo-row:active { opacity: 0.7; }
+
+    .row-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .row-meta {
+      display: flex;
+      gap: 0.55rem;
+      color: rgba(240, 230, 212, 0.5);
+      font-size: 0.82rem;
+    }
+
+    .row-body {
+      color: rgba(240, 230, 212, 0.68);
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .todo-row {
+      grid-template-columns: 2.4rem 1fr;
+      align-items: start;
+      column-gap: 0.7rem;
+    }
+
+    .check {
+      width: 1.55rem;
+      height: 1.55rem;
+      margin-top: 0.15rem;
+      border-radius: 0.4rem;
+      border: 1px solid var(--line);
+      background: rgba(255, 244, 224, 0.05);
+      display: grid;
+      place-items: center;
+      transition: transform 0.16s ease, background 0.16s ease;
+    }
+
+    .check.is-on {
+      background: var(--sage);
+      border-color: var(--sage);
+      color: #102016;
+    }
+
+    .check.is-on::after {
+      content: "";
+      width: 0.38rem;
+      height: 0.7rem;
+      border-right: 2px solid #102016;
+      border-bottom: 2px solid #102016;
+      transform: rotate(45deg) translate(-1px, -1px);
+    }
+
+    .todo-row.is-done .row-title {
+      text-decoration: line-through;
+      color: rgba(240, 230, 212, 0.42);
+    }
+
+    .todo-main { text-align: left; }
+
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(var(--dock-h) + 0.8rem);
+      transform: translateX(-50%) translateY(8px);
+      z-index: 9;
+      padding: 0.7rem 1rem;
+      border-radius: 0.8rem;
+      font-size: 0.9rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      width: max-content;
+      max-width: calc(100% - 2rem);
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .hidden { display: none !important; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section id="view-home" class="view active">
+      <div class="hero-visual" aria-hidden="true">
+        <svg viewBox="0 0 430 240" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="page" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#2a241c"/>
+              <stop offset="1" stop-color="#161310"/>
+            </linearGradient>
+          </defs>
+          <rect width="430" height="240" fill="#100e0c"/>
+          <g transform="translate(48 18) rotate(-8)">
+            <rect x="18" y="10" width="310" height="220" rx="6" fill="#1d1914" stroke="#c9a36a" stroke-opacity=".25"/>
+            <rect x="0" y="0" width="310" height="220" rx="6" fill="url(#page)" stroke="#f0e6d4" stroke-opacity=".18"/>
+            <rect x="0" y="0" width="18" height="220" fill="#c9a36a" fill-opacity=".18"/>
+            <g stroke="#f0e6d4" stroke-opacity=".12" stroke-width="1">
+              <path d="M36 42h250M36 68h250M36 94h250M36 120h250M36 146h250M36 172h210"/>
+            </g>
+            <path d="M48 58c40 8 70-10 118 6 30 10 58 4 92-8" fill="none" stroke="#c9a36a" stroke-width="1.6" stroke-linecap="round" opacity=".85"/>
+            <path d="M48 86c52-6 88 14 140 2" fill="none" stroke="#f0e6d4" stroke-width="1.2" stroke-linecap="round" opacity=".35"/>
+          </g>
+          <g transform="translate(300 128) rotate(22)">
+            <rect x="0" y="0" width="10" height="96" rx="4" fill="#c9a36a"/>
+            <rect x="1.5" y="8" width="7" height="70" rx="2" fill="#3a3228"/>
+            <polygon points="1,96 9,96 5,118" fill="#d8c4a0"/>
+          </g>
+        </svg>
+      </div>
+      <header class="brand-block">
+        <h1>Smartnote</h1>
+        <p class="headline">Schrijf het op. Regel het later.</p>
+        <p class="lede">Notities en to-do’s, altijd bij de hand.</p>
+      </header>
+      <div class="cta-stack">
+        <button class="glass giant note" type="button" data-go="note">
+          <strong>Notitie maken</strong>
+          <span>Titel, kenmerk en omschrijving</span>
+        </button>
+        <button class="glass giant todo" type="button" data-go="todo">
+          <strong>To-do opslaan</strong>
+          <span>Met periode: z.s.m., binnenkort of later</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="view-note" class="view">
+      <header class="screen-head">
+        <button class="glass back" type="button" data-go="home" aria-label="Terug">‹</button>
+        <h2 id="note-heading">Nieuwe notitie</h2>
+      </header>
+      <form id="note-form">
+        <label class="field">Titel
+          <input id="note-title" name="title" type="text" maxlength="200" required autocomplete="off" enterkeyhint="next">
+        </label>
+        <label class="field">Kenmerk
+          <input id="note-kenmerk" name="kenmerk" type="text" maxlength="80" autocomplete="off" placeholder="bijv. werk, idee, privé">
+        </label>
+        <div>
+          <div class="tools" style="margin-bottom:.45rem">
+            <button class="glass" type="button" data-list="dot">• punten</button>
+            <button class="glass" type="button" data-list="num">1. nummer</button>
+            <button class="glass" type="button" data-list="plain">tekst</button>
+          </div>
+          <label class="field">Omschrijving
+            <textarea id="note-body" name="beschrijving" maxlength="20000" placeholder="Schrijf hier… gebruik punten of nummering."></textarea>
+          </label>
+        </div>
+        <button class="glass save" type="submit">Opslaan</button>
+        <button class="danger hidden" id="note-delete" type="button">Verwijderen</button>
+      </form>
+    </section>
+
+    <section id="view-todo" class="view">
+      <header class="screen-head">
+        <button class="glass back" type="button" data-go="home" aria-label="Terug">‹</button>
+        <h2 id="todo-heading">Nieuwe to-do</h2>
+      </header>
+      <form id="todo-form">
+        <label class="field">Titel
+          <input id="todo-title" name="title" type="text" maxlength="200" required autocomplete="off" enterkeyhint="next">
+        </label>
+        <label class="field">Kenmerk
+          <input id="todo-kenmerk" name="kenmerk" type="text" maxlength="80" autocomplete="off" placeholder="bijv. huis, werk, boodschap">
+        </label>
+        <fieldset class="period">
+          <legend>Periode</legend>
+          <label class="glass"><input type="radio" name="periode" value="zsm" checked> z.s.m.</label>
+          <label class="glass"><input type="radio" name="periode" value="binnenkort"> Binnenkort</label>
+          <label class="glass"><input type="radio" name="periode" value="later"> Later</label>
+        </fieldset>
+        <button class="glass save" type="submit">Opslaan</button>
+        <button class="danger hidden" id="todo-delete" type="button">Verwijderen</button>
+      </form>
+    </section>
+
+    <section id="view-notes" class="view">
+      <header class="screen-head">
+        <button class="glass back" type="button" data-go="home" aria-label="Home">‹</button>
+        <h2>Notities</h2>
+      </header>
+      <div id="notes-list" class="list"></div>
+    </section>
+
+    <section id="view-todos" class="view">
+      <header class="screen-head">
+        <button class="glass back" type="button" data-go="home" aria-label="Home">‹</button>
+        <h2>To-do’s</h2>
+      </header>
+      <div id="todos-list" class="list"></div>
+    </section>
+
+    <nav class="dock" aria-label="Lijsten">
+      <button class="glass" type="button" data-go="notes">Notities</button>
+      <button class="glass" type="button" data-go="todos">To-do’s</button>
+    </nav>
+  </div>
+
+  <div id="toast" class="glass" role="status"></div>
+
+  <script>
+    const PERIODS = { zsm: "z.s.m.", binnenkort: "Binnenkort", later: "Later" };
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+    let noteId = "";
+    let todoId = "";
+    let deleteArmed = "";
+
+    function go(route) {
+      location.hash = route.startsWith("#") ? route : "#" + route;
+    }
+
+    function route() {
+      const raw = (location.hash || "#home").replace(/^#\/?/, "") || "home";
+      const [name, id] = raw.split("/");
+      return { name, id: id || "" };
+    }
+
+    function toast(msg) {
+      const el = $("#toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove("show"), 2200);
+    }
+
+    function esc(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[ch]));
+    }
+
+    function fmtDate(value) {
+      if (!value) return "";
+      const iso = value.includes("T") ? value : value.replace(" ", "T");
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return "";
+      return d.toLocaleDateString("nl-NL", { day: "numeric", month: "short" });
+    }
+
+    async function parseErr(res) {
+      try {
+        const data = await res.json();
+        return data.message || res.statusText;
+      } catch {
+        return res.statusText || "Onbekende fout";
+      }
+    }
+
+    async function api(path, options = {}) {
+      const { body, headers, ...rest } = options;
+      const res = await fetch("/api" + path, {
+        headers: { "Content-Type": "application/json", ...(headers || {}) },
+        ...rest,
+        body: body ? JSON.stringify(body) : undefined
+      });
+      if (!res.ok) throw new Error(await parseErr(res));
+      if (res.status === 204) return null;
+      const text = await res.text();
+      return text ? JSON.parse(text) : null;
+    }
+
+    function showView(name) {
+      $$(".view").forEach((view) => view.classList.toggle("active", view.id === "view-" + name));
+      $$(".dock button").forEach((btn) => btn.classList.toggle("is-on", btn.dataset.go === name));
+    }
+
+    function applyList(kind) {
+      const ta = $("#note-body");
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const val = ta.value;
+      const lineStart = val.lastIndexOf("\n", start - 1) + 1;
+      const nl = val.indexOf("\n", end);
+      const sliceEnd = nl === -1 ? val.length : nl;
+      const block = val.slice(lineStart, sliceEnd);
+      const next = block.split("\n").map((line, i) => {
+        const stripped = line.replace(/^\s*(?:[•\-*]|\d+\.)\s+/, "");
+        if (kind === "plain") return stripped;
+        if (kind === "dot") return "• " + stripped;
+        return (i + 1) + ". " + stripped;
+      }).join("\n");
+      ta.value = val.slice(0, lineStart) + next + val.slice(sliceEnd);
+      ta.focus();
+    }
+
+    function resetNoteForm() {
+      noteId = "";
+      $("#note-form").reset();
+      $("#note-heading").textContent = "Nieuwe notitie";
+      $("#note-delete").classList.add("hidden");
+      deleteArmed = "";
+    }
+
+    function resetTodoForm() {
+      todoId = "";
+      $("#todo-form").reset();
+      $("#todo-heading").textContent = "Nieuwe to-do";
+      $("#todo-delete").classList.add("hidden");
+      $("input[name=periode][value=zsm]").checked = true;
+      deleteArmed = "";
+    }
+
+    async function fillNote(id) {
+      resetNoteForm();
+      if (!id) return;
+      const rec = await api("/collections/notes/records/" + encodeURIComponent(id));
+      noteId = rec.id;
+      $("#note-title").value = rec.title || "";
+      $("#note-kenmerk").value = rec.kenmerk || "";
+      $("#note-body").value = rec.beschrijving || "";
+      $("#note-heading").textContent = "Notitie";
+      $("#note-delete").classList.remove("hidden");
+    }
+
+    async function fillTodo(id) {
+      resetTodoForm();
+      if (!id) return;
+      const rec = await api("/collections/todos/records/" + encodeURIComponent(id));
+      todoId = rec.id;
+      $("#todo-title").value = rec.title || "";
+      $("#todo-kenmerk").value = rec.kenmerk || "";
+      const radio = $('input[name=periode][value="' + rec.periode + '"]');
+      if (radio) radio.checked = true;
+      $("#todo-heading").textContent = "To-do";
+      $("#todo-delete").classList.remove("hidden");
+    }
+
+    async function loadNotes() {
+      const box = $("#notes-list");
+      box.innerHTML = '<p class="empty">Laden…</p>';
+      const data = await api("/collections/notes/records?sort=-created&perPage=200");
+      if (!data.items.length) {
+        box.innerHTML = '<p class="empty">Nog geen notities. Maak er een vanaf het startscherm.</p>';
+        return;
+      }
+      box.innerHTML = data.items.map((item) => `
+        <button class="note-row" type="button" data-open-note="${esc(item.id)}">
+          <span class="row-title">${esc(item.title)}</span>
+          <span class="row-meta">${item.kenmerk ? esc(item.kenmerk) : "zonder kenmerk"} · ${esc(fmtDate(item.created))}</span>
+          <span class="row-body">${esc(item.beschrijving || "")}</span>
+        </button>
+      `).join("");
+    }
+
+    async function loadTodos() {
+      const box = $("#todos-list");
+      box.innerHTML = '<p class="empty">Laden…</p>';
+      const data = await api("/collections/todos/records?sort=done,-created&perPage=200");
+      if (!data.items.length) {
+        box.innerHTML = '<p class="empty">Nog geen to-do’s. Sla er een op vanaf het startscherm.</p>';
+        return;
+      }
+      box.innerHTML = data.items.map((item) => `
+        <div class="todo-row${item.done ? " is-done" : ""}">
+          <button class="check${item.done ? " is-on" : ""}" type="button" data-todo-check="${esc(item.id)}" data-done="${item.done ? "1" : "0"}" aria-label="Afvinken"></button>
+          <button class="todo-main" type="button" data-open-todo="${esc(item.id)}">
+            <span class="row-title">${esc(item.title)}</span>
+            <span class="row-meta">${esc(PERIODS[item.periode] || item.periode)}${item.kenmerk ? " · " + esc(item.kenmerk) : ""}</span>
+          </button>
+        </div>
+      `).join("");
+    }
+
+    async function render() {
+      const { name, id } = route();
+      const view = ["home", "note", "todo", "notes", "todos"].includes(name) ? name : "home";
+      showView(view);
+      try {
+        if (view === "note") await fillNote(id);
+        if (view === "todo") await fillTodo(id);
+        if (view === "notes") await loadNotes();
+        if (view === "todos") await loadTodos();
+      } catch (err) {
+        toast(err.message || "Kan PocketBase niet bereiken");
+      }
+    }
+
+    document.addEventListener("click", async (event) => {
+      const goBtn = event.target.closest("[data-go]");
+      if (goBtn) {
+        go(goBtn.dataset.go);
+        return;
+      }
+      const openNote = event.target.closest("[data-open-note]");
+      if (openNote) {
+        go("note/" + openNote.dataset.openNote);
+        return;
+      }
+      const openTodo = event.target.closest("[data-open-todo]");
+      if (openTodo) {
+        go("todo/" + openTodo.dataset.openTodo);
+        return;
+      }
+      const listBtn = event.target.closest("[data-list]");
+      if (listBtn) {
+        applyList(listBtn.dataset.list);
+        return;
+      }
+      const check = event.target.closest("[data-todo-check]");
+      if (check) {
+        const id = check.dataset.todoCheck;
+        const next = check.dataset.done !== "1";
+        try {
+          await api("/collections/todos/records/" + encodeURIComponent(id), {
+            method: "PATCH",
+            body: { done: next }
+          });
+          await loadTodos();
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+    });
+
+    $("#note-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const body = {
+        title: $("#note-title").value.trim(),
+        kenmerk: $("#note-kenmerk").value.trim(),
+        beschrijving: $("#note-body").value
+      };
+      if (!body.title) return toast("Vul een titel in");
+      try {
+        if (noteId) {
+          await api("/collections/notes/records/" + encodeURIComponent(noteId), { method: "PATCH", body });
+        } else {
+          await api("/collections/notes/records", { method: "POST", body });
+        }
+        toast("Notitie opgeslagen");
+        go("notes");
+      } catch (err) {
+        toast(err.message);
+      }
+    });
+
+    $("#todo-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const body = {
+        title: $("#todo-title").value.trim(),
+        kenmerk: $("#todo-kenmerk").value.trim(),
+        periode: ($("input[name=periode]:checked") || {}).value || "zsm"
+      };
+      if (!body.title) return toast("Vul een titel in");
+      try {
+        if (todoId) {
+          await api("/collections/todos/records/" + encodeURIComponent(todoId), { method: "PATCH", body });
+        } else {
+          await api("/collections/todos/records", { method: "POST", body: { ...body, done: false } });
+        }
+        toast("To-do opgeslagen");
+        go("todos");
+      } catch (err) {
+        toast(err.message);
+      }
+    });
+
+    async function confirmDelete(kind, btn) {
+      const key = kind + ":" + (kind === "note" ? noteId : todoId);
+      if (deleteArmed !== key) {
+        deleteArmed = key;
+        btn.textContent = "Zeker weten?";
+        return;
+      }
+      try {
+        if (kind === "note") {
+          await api("/collections/notes/records/" + encodeURIComponent(noteId), { method: "DELETE" });
+          toast("Notitie verwijderd");
+          go("notes");
+        } else {
+          await api("/collections/todos/records/" + encodeURIComponent(todoId), { method: "DELETE" });
+          toast("To-do verwijderd");
+          go("todos");
+        }
+      } catch (err) {
+        toast(err.message);
+      }
+    }
+
+    $("#note-delete").addEventListener("click", () => confirmDelete("note", $("#note-delete")));
+    $("#todo-delete").addEventListener("click", () => confirmDelete("todo", $("#todo-delete")));
+
+    window.addEventListener("hashchange", render);
+    render();
+  </script>
+</body>
+</html>
