@@ -415,7 +415,7 @@
     }
 
     .note-row {
-      grid-template-columns: 2.4rem 1fr;
+      grid-template-columns: 2.4rem 1fr auto;
       align-items: start;
       column-gap: 0.7rem;
     }
@@ -493,7 +493,7 @@
     }
 
     .todo-row {
-      grid-template-columns: 2.4rem 1fr 2.2rem auto;
+      grid-template-columns: 2.4rem 1fr 2.2rem auto auto;
       align-items: start;
       column-gap: 0.7rem;
     }
@@ -568,6 +568,203 @@
     }
 
     .hidden { display: none !important; }
+
+    .attach-btn {
+      width: 2.2rem;
+      height: 2.2rem;
+      margin-top: 0.05rem;
+      border-radius: 0.55rem;
+      border: 1px solid rgba(201, 163, 106, 0.38);
+      background: rgba(201, 163, 106, 0.12);
+      color: var(--brass);
+      display: grid;
+      place-items: center;
+      transition: transform 0.16s ease, background 0.16s ease;
+    }
+
+    .attach-btn:active { transform: scale(0.94); }
+
+    .attach-spacer {
+      width: 2.2rem;
+    }
+
+    .attach-btn svg {
+      width: 1rem;
+      height: 1rem;
+      fill: currentColor;
+    }
+
+    .file-picker input[type="file"] {
+      font-size: 16px;
+      color: rgba(240, 230, 212, 0.72);
+    }
+
+    .file-chips {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      margin-top: 0.35rem;
+    }
+
+    .file-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      padding: 0.55rem 0.7rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--line);
+      background: rgba(255, 244, 224, 0.05);
+      font-size: 0.86rem;
+    }
+
+    .file-chip span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-chip button {
+      flex-shrink: 0;
+      color: #e0b4aa;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 1rem 1rem calc(var(--dock-h) + 0.75rem);
+    }
+
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.68);
+    }
+
+    .modal-panel {
+      position: relative;
+      width: min(100%, 430px);
+      max-height: 78dvh;
+      border-radius: 1rem;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      overflow: hidden;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .modal-head h3 {
+      font-family: var(--font-brand);
+      font-size: 1.35rem;
+      font-weight: 500;
+    }
+
+    .modal-close {
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 0.65rem;
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+
+    .files-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.55rem;
+      overflow-y: auto;
+      padding-bottom: 0.15rem;
+    }
+
+    .file-tile {
+      border: 1px solid var(--line);
+      border-radius: 0.8rem;
+      background: rgba(255, 244, 224, 0.05);
+      padding: 0.35rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      min-height: 6.5rem;
+      cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.16s ease;
+    }
+
+    .file-tile:active {
+      transform: scale(0.97);
+      border-color: rgba(201, 163, 106, 0.55);
+    }
+
+    .file-thumb {
+      flex: 1;
+      min-height: 4.5rem;
+      border-radius: 0.55rem;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.22);
+    }
+
+    .file-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .file-thumb .file-icon {
+      font-size: 1.7rem;
+      opacity: 0.75;
+    }
+
+    .file-tile-name {
+      font-size: 0.64rem;
+      line-height: 1.25;
+      color: rgba(240, 230, 212, 0.58);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    #preview-body {
+      display: grid;
+      place-items: center;
+      min-height: 8rem;
+      overflow: auto;
+    }
+
+    #preview-body img {
+      max-width: 100%;
+      max-height: 55dvh;
+      object-fit: contain;
+      border-radius: 0.65rem;
+    }
+
+    #preview-body .preview-fallback {
+      text-align: center;
+      line-height: 1.5;
+      color: rgba(240, 230, 212, 0.72);
+    }
+
+    #preview-open {
+      width: 100%;
+      min-height: 2.8rem;
+      border-radius: 0.85rem;
+      font-weight: 600;
+    }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -645,6 +842,10 @@
             <textarea id="note-body" name="beschrijving" maxlength="20000" placeholder="Schrijf hier… gebruik punten of nummering."></textarea>
           </label>
         </div>
+        <label class="field file-picker">Bijlagen
+          <input id="note-bijlagen" type="file" multiple accept="image/*,application/pdf,video/*,audio/*,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip">
+        </label>
+        <ul id="note-bijlagen-list" class="file-chips"></ul>
         <button class="glass save" type="submit">Opslaan</button>
         <button class="danger hidden" id="note-delete" type="button">Verwijderen</button>
       </form>
@@ -668,6 +869,10 @@
           <label class="glass"><input type="radio" name="periode" value="binnenkort"> Binnenkort</label>
           <label class="glass"><input type="radio" name="periode" value="later"> Later</label>
         </fieldset>
+        <label class="field file-picker">Bijlagen
+          <input id="todo-bijlagen" type="file" multiple accept="image/*,application/pdf,video/*,audio/*,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip">
+        </label>
+        <ul id="todo-bijlagen-list" class="file-chips"></ul>
         <button class="glass save" type="submit">Opslaan</button>
         <button class="danger hidden" id="todo-delete" type="button">Verwijderen</button>
       </form>
@@ -707,6 +912,29 @@
 
   <div id="toast" class="glass" role="status"></div>
 
+  <div id="files-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="files-modal-title">
+    <div class="modal-backdrop" data-close-modal="files"></div>
+    <div class="modal-panel glass">
+      <div class="modal-head">
+        <h3 id="files-modal-title">Bijlagen</h3>
+        <button class="glass modal-close" type="button" data-close-modal="files" aria-label="Sluiten">×</button>
+      </div>
+      <div id="files-grid" class="files-grid"></div>
+    </div>
+  </div>
+
+  <div id="preview-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="preview-modal-title">
+    <div class="modal-backdrop" data-close-modal="preview"></div>
+    <div class="modal-panel glass">
+      <div class="modal-head">
+        <h3 id="preview-modal-title">Voorbeeld</h3>
+        <button class="glass modal-close" type="button" data-close-modal="preview" aria-label="Sluiten">×</button>
+      </div>
+      <div id="preview-body"></div>
+      <a id="preview-open" class="glass btn" href="#" target="_blank" rel="noopener">Openen</a>
+    </div>
+  </div>
+
   <script>
     const PERIODS = { zsm: "z.s.m.", binnenkort: "Binnenkort", later: "Later" };
     const $ = (sel, root = document) => root.querySelector(sel);
@@ -720,6 +948,13 @@
     let todosItems = [];
     let notesKenmerkFilter = "";
     let todosKenmerkFilter = "";
+    let noteNewFiles = [];
+    let noteRemoveFiles = [];
+    let noteExistingFiles = [];
+    let todoNewFiles = [];
+    let todoRemoveFiles = [];
+    let todoExistingFiles = [];
+    let filesModalContext = null;
     const NO_KENMERK = "__none__";
 
     function go(route) {
@@ -744,6 +979,132 @@
       return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
       }[ch]));
+    }
+
+    function fileList(value) {
+      if (!value) return [];
+      if (Array.isArray(value)) return value.filter(Boolean);
+      return [value];
+    }
+
+    function displayName(filename) {
+      const match = filename.match(/^(.+)_[a-z0-9]{8,12}(\.[^.]+)$/i);
+      return match ? match[1] + match[2] : filename;
+    }
+
+    function isImageName(filename) {
+      return /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(filename);
+    }
+
+    function fileUrl(collection, recordId, filename, thumb) {
+      const url = `/api/files/${collection}/${recordId}/${encodeURIComponent(filename)}`;
+      return thumb ? `${url}?thumb=${thumb}` : url;
+    }
+
+    function closeModal(name) {
+      $(`#${name}-modal`).classList.add("hidden");
+      if (name === "files") filesModalContext = null;
+    }
+
+    function attachBtn(collection, item) {
+      const files = fileList(item.bijlagen);
+      if (!files.length) return '<span class="attach-spacer" aria-hidden="true"></span>';
+      return `
+        <button class="attach-btn glass" type="button" data-show-bijlagen="${collection}" data-record-id="${esc(item.id)}" aria-label="${files.length} bijlage(n)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 6v11a4.5 4.5 0 1 1-9 0V5a3 3 0 1 1 6 0v10a1.5 1.5 0 1 1-3 0V6h1.5v9a0.2 0.2 0 0 0 .4 0V5a1.5 1.5 0 1 0-3 0v12a3 3 0 1 0 6 0V6h1.5z"/></svg>
+        </button>
+      `;
+    }
+
+    function openFilesModal(collection, recordId, files, title) {
+      filesModalContext = { collection, recordId, files, title };
+      $("#files-modal-title").textContent = title || "Bijlagen";
+      $("#files-grid").innerHTML = files.map((filename) => {
+        const thumb = isImageName(filename)
+          ? `<img src="${fileUrl(collection, recordId, filename, "200x200f")}" alt="">`
+          : `<span class="file-icon">📄</span>`;
+        return `
+          <button class="file-tile" type="button" data-open-file="${esc(filename)}">
+            <div class="file-thumb">${thumb}</div>
+            <span class="file-tile-name">${esc(displayName(filename))}</span>
+          </button>
+        `;
+      }).join("");
+      $("#files-modal").classList.remove("hidden");
+    }
+
+    function openFilePreview(collection, recordId, filename) {
+      const url = fileUrl(collection, recordId, filename);
+      const body = $("#preview-body");
+      $("#preview-modal-title").textContent = displayName(filename);
+      $("#preview-open").href = url;
+      if (isImageName(filename)) {
+        body.innerHTML = `<img src="${fileUrl(collection, recordId, filename, "800x0")}" alt="${esc(displayName(filename))}">`;
+      } else {
+        body.innerHTML = `<div class="preview-fallback"><p>${esc(displayName(filename))}</p><p>Open dit bestand via de knop hieronder.</p></div>`;
+      }
+      $("#preview-modal").classList.remove("hidden");
+    }
+
+    function renderFormFiles(kind) {
+      const isNote = kind === "note";
+      const listEl = $(isNote ? "#note-bijlagen-list" : "#todo-bijlagen-list");
+      const existing = isNote ? noteExistingFiles : todoExistingFiles;
+      const pending = isNote ? noteNewFiles : todoNewFiles;
+      const removed = isNote ? noteRemoveFiles : todoRemoveFiles;
+      const chips = [];
+
+      existing.forEach((filename) => {
+        if (removed.includes(filename)) return;
+        chips.push(`
+          <li class="file-chip glass">
+            <span>${esc(displayName(filename))}</span>
+            <button type="button" data-remove-existing="${isNote ? "note" : "todo"}" data-filename="${esc(filename)}">Verwijder</button>
+          </li>
+        `);
+      });
+
+      pending.forEach((file, index) => {
+        chips.push(`
+          <li class="file-chip glass">
+            <span>${esc(file.name)} <em style="opacity:.55">(nieuw)</em></span>
+            <button type="button" data-remove-pending="${isNote ? "note" : "todo"}" data-index="${index}">Verwijder</button>
+          </li>
+        `);
+      });
+
+      listEl.innerHTML = chips.join("");
+    }
+
+    async function saveWithBijlagen(collection, id, fields, newFiles, removeFiles) {
+      if (id) {
+        const patch = { ...fields };
+        if (removeFiles.length) patch["bijlagen-"] = removeFiles;
+        if (Object.keys(patch).length) {
+          await api(`/collections/${collection}/records/` + encodeURIComponent(id), {
+            method: "PATCH",
+            body: patch
+          });
+        }
+        if (newFiles.length) {
+          const fd = new FormData();
+          newFiles.forEach((file) => fd.append("bijlagen+", file));
+          return apiForm(`/collections/${collection}/records/` + encodeURIComponent(id), {
+            method: "PATCH",
+            body: fd
+          });
+        }
+        return null;
+      }
+
+      if (newFiles.length) {
+        const fd = new FormData();
+        Object.entries(fields).forEach(([key, value]) => fd.append(key, value));
+        newFiles.forEach((file) => fd.append("bijlagen", file));
+        return apiForm(`/collections/${collection}/records`, { method: "POST", body: fd });
+      }
+
+      return api(`/collections/${collection}/records`, { method: "POST", body: fields });
     }
 
     function parsePbDate(value) {
@@ -899,6 +1260,7 @@
             <span class="row-meta">${item.kenmerk ? esc(item.kenmerk) : "zonder kenmerk"} · ${esc(fmtDate(item.created))}</span>
             <span class="row-body">${esc(item.beschrijving || "")}</span>
           </button>
+          ${attachBtn("notes", item)}
         </div>
       `).join("");
     }
@@ -927,6 +1289,7 @@
             <span class="row-meta">${esc(PERIODS[item.periode] || item.periode)}${item.kenmerk ? " · " + esc(item.kenmerk) : ""}</span>
           </button>
           ${pinButton("todo", item)}
+          ${attachBtn("todos", item)}
           <span class="row-age" data-created="${esc(item.created)}" aria-label="Aangemaakt ${esc(fmtElapsed(item.created))} geleden">${esc(fmtElapsed(item.created))}</span>
         </div>
       `).join("");
@@ -948,6 +1311,19 @@
         headers: { "Content-Type": "application/json", ...(headers || {}) },
         ...rest,
         body: body ? JSON.stringify(body) : undefined
+      });
+      if (!res.ok) throw new Error(await parseErr(res));
+      if (res.status === 204) return null;
+      const text = await res.text();
+      return text ? JSON.parse(text) : null;
+    }
+
+    async function apiForm(path, options = {}) {
+      const { body, headers, ...rest } = options;
+      const res = await fetch("/api" + path, {
+        ...rest,
+        headers: { ...(headers || {}) },
+        body
       });
       if (!res.ok) throw new Error(await parseErr(res));
       if (res.status === 204) return null;
@@ -981,7 +1357,11 @@
 
     function resetNoteForm() {
       noteId = "";
+      noteNewFiles = [];
+      noteRemoveFiles = [];
+      noteExistingFiles = [];
       $("#note-form").reset();
+      $("#note-bijlagen-list").innerHTML = "";
       $("#note-heading").textContent = "Nieuwe notitie";
       $("#note-delete").classList.add("hidden");
       deleteArmed = "";
@@ -989,7 +1369,11 @@
 
     function resetTodoForm() {
       todoId = "";
+      todoNewFiles = [];
+      todoRemoveFiles = [];
+      todoExistingFiles = [];
       $("#todo-form").reset();
+      $("#todo-bijlagen-list").innerHTML = "";
       $("#todo-heading").textContent = "Nieuwe to-do";
       $("#todo-delete").classList.add("hidden");
       $("input[name=periode][value=zsm]").checked = true;
@@ -1004,6 +1388,8 @@
       $("#note-title").value = rec.title || "";
       $("#note-kenmerk").value = rec.kenmerk || "";
       $("#note-body").value = rec.beschrijving || "";
+      noteExistingFiles = fileList(rec.bijlagen);
+      renderFormFiles("note");
       $("#note-heading").textContent = "Notitie";
       $("#note-delete").classList.remove("hidden");
     }
@@ -1017,6 +1403,8 @@
       $("#todo-kenmerk").value = rec.kenmerk || "";
       const radio = $('input[name=periode][value="' + rec.periode + '"]');
       if (radio) radio.checked = true;
+      todoExistingFiles = fileList(rec.bijlagen);
+      renderFormFiles("todo");
       $("#todo-heading").textContent = "To-do";
       $("#todo-delete").classList.remove("hidden");
     }
@@ -1108,22 +1496,63 @@
         }
         return;
       }
+      const showBijlagen = event.target.closest("[data-show-bijlagen]");
+      if (showBijlagen) {
+        const collection = showBijlagen.dataset.showBijlagen;
+        const recordId = showBijlagen.dataset.recordId;
+        const items = collection === "notes" ? notesItems : todosItems;
+        const item = items.find((entry) => entry.id === recordId);
+        if (!item) return;
+        const files = fileList(item.bijlagen);
+        openFilesModal(collection, recordId, files, item.title);
+        return;
+      }
+      const openFile = event.target.closest("[data-open-file]");
+      if (openFile && filesModalContext) {
+        openFilePreview(filesModalContext.collection, filesModalContext.recordId, openFile.dataset.openFile);
+        return;
+      }
+      const closeModalBtn = event.target.closest("[data-close-modal]");
+      if (closeModalBtn) {
+        closeModal(closeModalBtn.dataset.closeModal);
+        return;
+      }
+      const removeExisting = event.target.closest("[data-remove-existing]");
+      if (removeExisting) {
+        const filename = removeExisting.dataset.filename;
+        if (removeExisting.dataset.removeExisting === "note") {
+          if (!noteRemoveFiles.includes(filename)) noteRemoveFiles.push(filename);
+          renderFormFiles("note");
+        } else {
+          if (!todoRemoveFiles.includes(filename)) todoRemoveFiles.push(filename);
+          renderFormFiles("todo");
+        }
+        return;
+      }
+      const removePending = event.target.closest("[data-remove-pending]");
+      if (removePending) {
+        const index = Number(removePending.dataset.index);
+        if (removePending.dataset.removePending === "note") {
+          noteNewFiles.splice(index, 1);
+          renderFormFiles("note");
+        } else {
+          todoNewFiles.splice(index, 1);
+          renderFormFiles("todo");
+        }
+        return;
+      }
     });
 
     $("#note-form").addEventListener("submit", async (event) => {
       event.preventDefault();
-      const body = {
+      const fields = {
         title: $("#note-title").value.trim(),
         kenmerk: $("#note-kenmerk").value.trim(),
         beschrijving: $("#note-body").value
       };
-      if (!body.title) return toast("Vul een titel in");
+      if (!fields.title) return toast("Vul een titel in");
       try {
-        if (noteId) {
-          await api("/collections/notes/records/" + encodeURIComponent(noteId), { method: "PATCH", body });
-        } else {
-          await api("/collections/notes/records", { method: "POST", body });
-        }
+        await saveWithBijlagen("notes", noteId, fields, noteNewFiles, noteRemoveFiles);
         toast("Notitie opgeslagen");
         go("notes");
       } catch (err) {
@@ -1133,17 +1562,17 @@
 
     $("#todo-form").addEventListener("submit", async (event) => {
       event.preventDefault();
-      const body = {
+      const fields = {
         title: $("#todo-title").value.trim(),
         kenmerk: $("#todo-kenmerk").value.trim(),
         periode: ($("input[name=periode]:checked") || {}).value || "zsm"
       };
-      if (!body.title) return toast("Vul een titel in");
+      if (!fields.title) return toast("Vul een titel in");
       try {
         if (todoId) {
-          await api("/collections/todos/records/" + encodeURIComponent(todoId), { method: "PATCH", body });
+          await saveWithBijlagen("todos", todoId, fields, todoNewFiles, todoRemoveFiles);
         } else {
-          await api("/collections/todos/records", { method: "POST", body: { ...body, done: false, pinned: false } });
+          await saveWithBijlagen("todos", "", { ...fields, done: false, pinned: false }, todoNewFiles, []);
         }
         toast("To-do opgeslagen");
         go("todos");
@@ -1185,6 +1614,18 @@
     $("#todos-filter").addEventListener("change", (event) => {
       todosKenmerkFilter = event.target.value;
       renderTodosList();
+    });
+
+    $("#note-bijlagen").addEventListener("change", (event) => {
+      noteNewFiles.push(...[...event.target.files]);
+      event.target.value = "";
+      renderFormFiles("note");
+    });
+
+    $("#todo-bijlagen").addEventListener("change", (event) => {
+      todoNewFiles.push(...[...event.target.files]);
+      event.target.value = "";
+      renderFormFiles("todo");
     });
 
     window.addEventListener("hashchange", render);
