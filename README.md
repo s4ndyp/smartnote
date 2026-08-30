@@ -1,6 +1,6 @@
 # Smartnote
 
-Smartphone-first notitie- en to-do-app. Eén HTML-bestand, donker glas-uiterlijk, opslag in [PocketBase](https://pocketbase.io) 0.40.1.
+Smartphone-first notitie- en to-do-app als **PWA**. Donker glas-uiterlijk, opslag in [PocketBase](https://pocketbase.io) 0.40.1.
 
 ## Starten met Docker
 
@@ -17,6 +17,19 @@ Stoppen:
 ```bash
 docker compose down
 ```
+
+## PWA installeren
+
+1. Open de app in Chrome/Safari op je telefoon (via HTTPS of localhost).
+2. Kies **Toevoegen aan startscherm** / **Installeren**.
+3. De app opent standalone met eigen icoon.
+
+Bestanden:
+
+- `pb_public/manifest.webmanifest` — app-metadata en iconen
+- `pb_public/sw.js` — service worker (shell caching; API blijft live)
+- `pb_public/offline.html` — fallback zonder netwerk
+- `pb_public/icons/` — app-iconen (16–512 px + maskable)
 
 ## Beheer
 
