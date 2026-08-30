@@ -33,6 +33,18 @@ migrate(
           name: "done",
           type: "bool",
         },
+        {
+          name: "created",
+          type: "autodate",
+          onCreate: true,
+          onUpdate: false,
+        },
+        {
+          name: "updated",
+          type: "autodate",
+          onCreate: true,
+          onUpdate: true,
+        },
       ],
     });
 

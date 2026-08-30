@@ -27,6 +27,18 @@ migrate(
           type: "text",
           max: 20000,
         },
+        {
+          name: "created",
+          type: "autodate",
+          onCreate: true,
+          onUpdate: false,
+        },
+        {
+          name: "updated",
+          type: "autodate",
+          onCreate: true,
+          onUpdate: true,
+        },
       ],
     });
 
