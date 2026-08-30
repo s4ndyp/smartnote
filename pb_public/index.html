@@ -414,6 +414,59 @@
       width: 100%;
     }
 
+    .note-row {
+      grid-template-columns: 2.4rem 1fr;
+      align-items: start;
+      column-gap: 0.7rem;
+    }
+
+    .note-row.is-pinned,
+    .todo-row.is-pinned {
+      background: linear-gradient(90deg, rgba(201, 163, 106, 0.1), transparent 55%);
+    }
+
+    .note-main,
+    .todo-main {
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      padding: 0;
+      cursor: pointer;
+      min-width: 0;
+    }
+
+    .pin {
+      width: 2.2rem;
+      height: 2.2rem;
+      margin-top: 0.05rem;
+      border-radius: 0.55rem;
+      border: 1px solid var(--line);
+      background: rgba(255, 244, 224, 0.05);
+      display: grid;
+      place-items: center;
+      transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+    }
+
+    .pin:active { transform: scale(0.94); }
+
+    .pin-icon {
+      width: 1rem;
+      height: 1rem;
+      fill: rgba(240, 230, 212, 0.38);
+      transition: fill 0.16s ease;
+    }
+
+    .pin.is-on {
+      background: linear-gradient(180deg, rgba(201, 163, 106, 0.34), rgba(201, 163, 106, 0.12));
+      border-color: rgba(201, 163, 106, 0.65);
+    }
+
+    .pin.is-on .pin-icon {
+      fill: var(--brass);
+    }
+
     .note-row:active, .todo-row:active { opacity: 0.7; }
 
     .row-title {
@@ -440,7 +493,7 @@
     }
 
     .todo-row {
-      grid-template-columns: 2.4rem 1fr auto;
+      grid-template-columns: 2.4rem 1fr 2.2rem auto;
       align-items: start;
       column-gap: 0.7rem;
     }
@@ -477,7 +530,7 @@
       color: rgba(240, 230, 212, 0.42);
     }
 
-    .todo-main { text-align: left; min-width: 0; }
+    .todo-main { min-width: 0; }
 
     .row-age {
       font-size: 0.78rem;
@@ -780,6 +833,50 @@
       return items.filter((item) => kenmerkKey(item) === filter);
     }
 
+    function sortNotes(items) {
+      return [...items].sort((a, b) => {
+        const pinDiff = Number(!!b.pinned) - Number(!!a.pinned);
+        if (pinDiff) return pinDiff;
+        return parsePbDate(b.created) - parsePbDate(a.created);
+      });
+    }
+
+    function sortTodos(items) {
+      return [...items].sort((a, b) => {
+        const pinDiff = Number(!!b.pinned) - Number(!!a.pinned);
+        if (pinDiff) return pinDiff;
+        const doneDiff = Number(!!a.done) - Number(!!b.done);
+        if (doneDiff) return doneDiff;
+        return parsePbDate(b.created) - parsePbDate(a.created);
+      });
+    }
+
+    function pinButton(kind, item) {
+      const pinned = !!item.pinned;
+      const attr = kind === "note" ? "data-note-pin" : "data-todo-pin";
+      const label = pinned ? "Losmaken" : "Vastpinnen";
+      return `
+        <button class="pin${pinned ? " is-on" : ""}" type="button" ${attr}="${esc(item.id)}" data-pinned="${pinned ? "1" : "0"}" aria-label="${label}">
+          <svg class="pin-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3v3l4 4v2h-5v8l-1 1-1-1v-8H8v-2l4-4V3h4z"/></svg>
+        </button>
+      `;
+    }
+
+    async function togglePin(kind, id, pinned) {
+      const collection = kind === "note" ? "notes" : "todos";
+      const items = kind === "note" ? notesItems : todosItems;
+      const next = !pinned;
+      await api("/collections/" + collection + "/records/" + encodeURIComponent(id), {
+        method: "PATCH",
+        body: { pinned: next }
+      });
+      const item = items.find((entry) => entry.id === id);
+      if (item) item.pinned = next;
+      if (kind === "note") renderNotesList();
+      else renderTodosList();
+      toast(next ? "Vastgepind" : "Losgemaakt");
+    }
+
     function renderNotesList() {
       const box = $("#notes-list");
       const toolbar = $("#notes-toolbar");
@@ -789,17 +886,20 @@
         return;
       }
       toolbar.classList.remove("hidden");
-      const filtered = filterByKenmerk(notesItems, notesKenmerkFilter);
+      const filtered = sortNotes(filterByKenmerk(notesItems, notesKenmerkFilter));
       if (!filtered.length) {
         box.innerHTML = '<p class="empty">Geen notities met dit kenmerk.</p>';
         return;
       }
       box.innerHTML = filtered.map((item) => `
-        <button class="note-row" type="button" data-open-note="${esc(item.id)}">
-          <span class="row-title">${esc(item.title)}</span>
-          <span class="row-meta">${item.kenmerk ? esc(item.kenmerk) : "zonder kenmerk"} · ${esc(fmtDate(item.created))}</span>
-          <span class="row-body">${esc(item.beschrijving || "")}</span>
-        </button>
+        <div class="note-row${item.pinned ? " is-pinned" : ""}">
+          ${pinButton("note", item)}
+          <button class="note-main" type="button" data-open-note="${esc(item.id)}">
+            <span class="row-title">${esc(item.title)}</span>
+            <span class="row-meta">${item.kenmerk ? esc(item.kenmerk) : "zonder kenmerk"} · ${esc(fmtDate(item.created))}</span>
+            <span class="row-body">${esc(item.beschrijving || "")}</span>
+          </button>
+        </div>
       `).join("");
     }
 
@@ -813,19 +913,20 @@
         return;
       }
       toolbar.classList.remove("hidden");
-      const filtered = filterByKenmerk(todosItems, todosKenmerkFilter);
+      const filtered = sortTodos(filterByKenmerk(todosItems, todosKenmerkFilter));
       if (!filtered.length) {
         stopAgeTimer();
         box.innerHTML = '<p class="empty">Geen to-do’s met dit kenmerk.</p>';
         return;
       }
       box.innerHTML = filtered.map((item) => `
-        <div class="todo-row${item.done ? " is-done" : ""}">
+        <div class="todo-row${item.done ? " is-done" : ""}${item.pinned ? " is-pinned" : ""}">
           <button class="check${item.done ? " is-on" : ""}" type="button" data-todo-check="${esc(item.id)}" data-done="${item.done ? "1" : "0"}" aria-label="Afvinken"></button>
           <button class="todo-main" type="button" data-open-todo="${esc(item.id)}">
             <span class="row-title">${esc(item.title)}</span>
             <span class="row-meta">${esc(PERIODS[item.periode] || item.periode)}${item.kenmerk ? " · " + esc(item.kenmerk) : ""}</span>
           </button>
+          ${pinButton("todo", item)}
           <span class="row-age" data-created="${esc(item.created)}" aria-label="Aangemaakt ${esc(fmtElapsed(item.created))} geleden">${esc(fmtElapsed(item.created))}</span>
         </div>
       `).join("");
@@ -987,6 +1088,25 @@
         } catch (err) {
           toast(err.message);
         }
+        return;
+      }
+      const notePin = event.target.closest("[data-note-pin]");
+      if (notePin) {
+        try {
+          await togglePin("note", notePin.dataset.notePin, notePin.dataset.pinned === "1");
+        } catch (err) {
+          toast(err.message);
+        }
+        return;
+      }
+      const todoPin = event.target.closest("[data-todo-pin]");
+      if (todoPin) {
+        try {
+          await togglePin("todo", todoPin.dataset.todoPin, todoPin.dataset.pinned === "1");
+        } catch (err) {
+          toast(err.message);
+        }
+        return;
       }
     });
 
@@ -1023,7 +1143,7 @@
         if (todoId) {
           await api("/collections/todos/records/" + encodeURIComponent(todoId), { method: "PATCH", body });
         } else {
-          await api("/collections/todos/records", { method: "POST", body: { ...body, done: false } });
+          await api("/collections/todos/records", { method: "POST", body: { ...body, done: false, pinned: false } });
         }
         toast("To-do opgeslagen");
         go("todos");
