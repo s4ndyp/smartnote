@@ -905,8 +905,8 @@
     </section>
 
     <nav class="dock" aria-label="Lijsten">
-      <button class="glass" type="button" data-go="notes">Notities</button>
-      <button class="glass" type="button" data-go="todos">To-do’s</button>
+      <button class="glass" type="button" id="dock-notes" data-go="notes">Notities</button>
+      <button class="glass" type="button" id="dock-todos" data-go="todos">To-do’s</button>
     </nav>
   </div>
 
@@ -1333,7 +1333,26 @@
 
     function showView(name) {
       $$(".view").forEach((view) => view.classList.toggle("active", view.id === "view-" + name));
-      $$(".dock button").forEach((btn) => btn.classList.toggle("is-on", btn.dataset.go === name));
+      const notesBtn = $("#dock-notes");
+      const todosBtn = $("#dock-todos");
+      if (name === "notes") {
+        notesBtn.textContent = "Nieuwe notitie";
+        notesBtn.dataset.go = "note";
+        notesBtn.classList.add("is-on");
+      } else {
+        notesBtn.textContent = "Notities";
+        notesBtn.dataset.go = "notes";
+        notesBtn.classList.toggle("is-on", name === "note");
+      }
+      if (name === "todos") {
+        todosBtn.textContent = "Nieuwe to-do";
+        todosBtn.dataset.go = "todo";
+        todosBtn.classList.add("is-on");
+      } else {
+        todosBtn.textContent = "To-do’s";
+        todosBtn.dataset.go = "todos";
+        todosBtn.classList.toggle("is-on", name === "todo");
+      }
     }
 
     function applyList(kind) {
