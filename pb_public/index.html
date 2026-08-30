@@ -391,7 +391,7 @@
     }
 
     .todo-row {
-      grid-template-columns: 2.4rem 1fr;
+      grid-template-columns: 2.4rem 1fr auto;
       align-items: start;
       column-gap: 0.7rem;
     }
@@ -428,7 +428,21 @@
       color: rgba(240, 230, 212, 0.42);
     }
 
-    .todo-main { text-align: left; }
+    .todo-main { text-align: left; min-width: 0; }
+
+    .row-age {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: rgba(240, 230, 212, 0.42);
+      white-space: nowrap;
+      padding-top: 0.2rem;
+      text-align: right;
+      letter-spacing: -0.01em;
+    }
+
+    .todo-row.is-done .row-age {
+      opacity: 0.55;
+    }
 
     #toast {
       position: fixed;
@@ -589,6 +603,7 @@
     let noteId = "";
     let todoId = "";
     let deleteArmed = "";
+    let ageTimer = null;
 
     function go(route) {
       location.hash = route.startsWith("#") ? route : "#" + route;
@@ -614,12 +629,51 @@
       }[ch]));
     }
 
-    function fmtDate(value) {
-      if (!value) return "";
+    function parsePbDate(value) {
+      if (!value) return null;
       const iso = value.includes("T") ? value : value.replace(" ", "T");
       const d = new Date(iso);
-      if (Number.isNaN(d.getTime())) return "";
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    function fmtDate(value) {
+      const d = parsePbDate(value);
+      if (!d) return "";
       return d.toLocaleDateString("nl-NL", { day: "numeric", month: "short" });
+    }
+
+    function fmtElapsed(value) {
+      const d = parsePbDate(value);
+      if (!d) return "";
+      const sec = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000));
+      if (sec < 60) return "nu";
+      const min = Math.floor(sec / 60);
+      if (min < 60) return min === 1 ? "1 min" : min + " min";
+      const hr = Math.floor(min / 60);
+      if (hr < 24) return hr === 1 ? "1 uur" : hr + " uur";
+      const day = Math.floor(hr / 24);
+      if (day < 30) return day === 1 ? "1 dag" : day + " dagen";
+      const month = Math.floor(day / 30);
+      if (month < 12) return month === 1 ? "1 maand" : month + " maanden";
+      const year = Math.floor(day / 365);
+      return year === 1 ? "1 jaar" : year + " jaren";
+    }
+
+    function refreshTodoAges() {
+      $$("[data-created]").forEach((el) => {
+        el.textContent = fmtElapsed(el.dataset.created);
+      });
+    }
+
+    function startAgeTimer() {
+      clearInterval(ageTimer);
+      refreshTodoAges();
+      ageTimer = setInterval(refreshTodoAges, 30000);
+    }
+
+    function stopAgeTimer() {
+      clearInterval(ageTimer);
+      ageTimer = null;
     }
 
     async function parseErr(res) {
@@ -732,6 +786,7 @@
       box.innerHTML = '<p class="empty">Laden…</p>';
       const data = await api("/collections/todos/records?sort=done,-created&perPage=200");
       if (!data.items.length) {
+        stopAgeTimer();
         box.innerHTML = '<p class="empty">Nog geen to-do’s. Sla er een op vanaf het startscherm.</p>';
         return;
       }
@@ -742,14 +797,17 @@
             <span class="row-title">${esc(item.title)}</span>
             <span class="row-meta">${esc(PERIODS[item.periode] || item.periode)}${item.kenmerk ? " · " + esc(item.kenmerk) : ""}</span>
           </button>
+          <span class="row-age" data-created="${esc(item.created)}" aria-label="Aangemaakt ${esc(fmtElapsed(item.created))} geleden">${esc(fmtElapsed(item.created))}</span>
         </div>
       `).join("");
+      startAgeTimer();
     }
 
     async function render() {
       const { name, id } = route();
       const view = ["home", "note", "todo", "notes", "todos"].includes(name) ? name : "home";
       showView(view);
+      if (view !== "todos") stopAgeTimer();
       try {
         if (view === "note") await fillNote(id);
         if (view === "todo") await fillTodo(id);
